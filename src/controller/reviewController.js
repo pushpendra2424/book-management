@@ -41,7 +41,7 @@ const reviewCreate = async function (req, res) {
         }
         let validBookId = await bookModel.findOne({ _id: Id, isDeleted: false })
         if (!validBookId) {
-            return res.status(400).send({ status: false, messaage: "Book doesn't exist" })
+            return res.status(404).send({ status: false, messaage: "Book doesn't exist" })
         }
 
         // if reviwedBy name is present than match with regex
@@ -67,7 +67,7 @@ const reviewCreate = async function (req, res) {
         return res.status(201).send({ status: true, message: "success", bookWithReview: updateBook, reviewData:reviews})
     }
     catch (err) {
-        return res.status(500).send({ error: err.message })
+        return res.status(500).send({ status:false,error: err.message })
     }
 }
 
@@ -87,19 +87,16 @@ const updateReview = async function (req, res) {
         }
         const existreviewId = await reviewModel.findOne({ _id: reviewId, bookId:Id ,isDeleted: false })
         if (!existreviewId) {
-            return res.status(400).send({ status: false, messaage: " review  not found " })
+            return res.status(404).send({ status: false, messaage: " review  not found " })
         }
-         
-        
         // check bookId is a valid ObjectId
         if (!isValidObjectId(Id)) {
             return res.status(400).send({ status: false, messaage: "Pleage provide valid bookId" })
         }
         const existBookId = await bookModel.findOne({ _id: Id, isDeleted: false })
         if (!existBookId) {
-            return res.status(400).send({ status: false, messaage: "book not found" })
+            return res.status(404).send({ status: false, messaage: "book not found" })
         }
-
         // check the data is provided to update the review
         if (!isValidRequestBody(data)) {
             return res.status(400).send({ status: false, messaage: "Pleage provide review details to update review " })
@@ -125,7 +122,7 @@ const updateReview = async function (req, res) {
         return res.status(200).send({ status: true, message: "review update succesfully", data: updateReview })
 
     } catch (err) {
-        return res.status(500).send({ error: err.message })
+        return res.status(500).send({ status: false,error: err.message })
     }
 }
 
@@ -149,13 +146,13 @@ const deleteReviewById = async function (req, res) {
         // find the book with book and check that is not deleted
         const book = await bookModel.findOne({ _id: bookId, isDeleted: false })
         if (!book) {
-            return res.status(400).send({ status: false, msg: 'book does not found' })
+            return res.status(404).send({ status: false, msg: 'book does not found' })
         }
 
         // find the book with book and check that is not deleted
         const review = await reviewModel.findOne({ _id: reviewId, bookId:bookId, isDeleted: false })
         if (!review) {
-            return res.status(400).send({ status: false, msg: 'review does not exist for given bookId' })
+            return res.status(404).send({ status: false, msg: 'review does not exist for given bookId' })
         }
 
         // set the isDeleted property of review to true 
@@ -165,9 +162,8 @@ const deleteReviewById = async function (req, res) {
         return res.status(200).send({ status: true, msg: 'review deleted successfully' })
 
     } catch (err) {
-        return res.status(500).send({ error: err.message })
+        return res.status(500).send({ status:false,error: err.message })
     }
-
 }
 
 module.exports = { reviewCreate, updateReview, deleteReviewById }

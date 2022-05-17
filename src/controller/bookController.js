@@ -60,7 +60,7 @@ const createBook = async function (req, res) {
         }
         const isUserIdExist = await userModel.findOne({ _id: userId })
 
-        if (!isUserIdExist) return res.status(400).send({ status: false, message: `${userId} userId does not exist` })
+        if (!isUserIdExist) return res.status(404).send({ status: false, message: `${userId} userId does not exist` })
 
         //by auth.js(decodede token userId)
         let user = req.userId
@@ -119,6 +119,9 @@ const getBooks = async function (req, res) {
         if (!isValidRequestBody(queryParams)) {
             // return all books that are not deleted and sort them in ascending
             let books = await bookModel.find({ isDeleted: false }).sort({ "title": 1 })
+            if(!books){
+                return res.status(404).send({ status: false, message: 'books not found' })
+            }
             return res.status(200).send({ status: true, msg: 'all book list', data: books })
 
         }
@@ -134,11 +137,11 @@ const getBooks = async function (req, res) {
             return res.status(200).send({ status: true, count: book.length, message: 'Books list', data: book })
         }
         else {
-            return res.status(404).send({ msg: "books not found" })
+            return res.status(404).send({status:false, msg: "books not found" })
         }
 
     } catch (err) {
-        return res.status(500).send({ status: true, error: err.message })
+        return res.status(500).send({ status: false, error: err.message })
     }
 }
 
@@ -158,15 +161,15 @@ const getBooksById = async function (req, res) {
         const bookDetails = await bookModel.findOne({ _id: bookId, isDeleted: false, });
         //If no Books found in bookModel
         if (!bookDetails) {
-            return res.status(404).send({ status: true, msg: "No books found." });
+            return res.status(404).send({ status: false, msg: "No books found." });
         }
 
         const reviews = await reviewModel.find({ bookId: bookId, isDeleted: false }); //finding the bookId in review Model
         const finalBookDetails = {bookDetails, reviewsData: reviews, }; //Storing data into new Object
-        return res.status(200).send({ status: true, msg: "Books list.", data: finalBookDetails });
+        return res.status(200).send({ status: true, msg: "Books list", data: finalBookDetails });
 
     } catch (err) {
-        return res.status(500).send({ error: err.message });
+        return res.status(500).send({ status:false,error: err.message });
     }
 };
 //  =============================Put Api======================================
@@ -185,7 +188,6 @@ const updateBooks = async function (req, res) {
         if (!book) {
             return res.status(404).send({ status: false, msg: "book not found" })
         }
-
         //by auth.js(decodede token userId)
         let userId = req.userId
         if (book.userId != userId) {

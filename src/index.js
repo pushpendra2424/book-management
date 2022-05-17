@@ -8,7 +8,7 @@ const app =express()
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended:true}));
 
-mongoose.connect("mongodb+srv://user:ISjwDttcDksEnCcv@cluster0.hja9z.mongodb.net/group44database?authSource=admin&replicaSet=atlas-3xefdb-shard-0&readPreference=primary&appname=MongoDB%20Compass&ssl=true" ,
+mongoose.connect("mongodb+srv://rohit2424:AdMyJHKIfWtpT31H@cluster0.ki3d0.mongodb.net/group44Database" ,
  { useNewUrlParser: true})
  
 .then(() => {
